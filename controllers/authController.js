@@ -10,10 +10,12 @@ const JWT_SECRET = process.env.JWT_SECRET
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    if(!name || !email || !password) return res.status(400).json({success:false, message:"All Fields Are Required"})
+    if (!name || !email || !password)
+      return res.status(400).json({ success: false, message: "All Fields Are Required" });
 
     const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) return res.status(400).json({success:false, message: 'Existing user with this email Id' });
+    if (existing)
+      return res.status(400).json({ success: false, message: 'Existing user with this email Id' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -21,9 +23,16 @@ export const register = async (req, res) => {
       data: { name, email, password: hashedPassword },
     });
 
-    res.status(201).json({success:true, message: 'User registered successfully', userId: user.userId });
+    //Create wallet for the user when user registered
+    await prisma.wallet.create({
+      data: {
+        userId: user.userId,
+      },
+    });
+
+    res.status(201).json({ success: true, message: 'User registered successfully', userId: user.userId });
   } catch (error) {
-    res.status(500).json({success:false, message:error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
