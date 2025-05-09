@@ -1,0 +1,93 @@
+[
+  {
+    "name": "RegisterUser",
+    "endpoint": "POST http://localhost:5070/api/user/register",
+    "json or request body": {
+        "name":"Niyo emmanuel",
+        "email":"niyonkurusam9@gmail.com",
+        "password":"12345678"
+        
+      },
+    "response": {
+        "success": true,
+        "message": "User registered successfully",
+        "userId": 4
+    }
+  },
+  {
+    "name": "Login User",
+    "endpoint": "POST http://localhost:5070/api/user/login",
+    "json or request body": {
+        "email":"niyonkuru@gmail.com",
+        "password":"12345678" 
+      },
+    "response": {
+        "token": "Bearer token",
+        "success": true,
+        "message": "Login successfully"
+    }
+  },
+  {
+    "name": "Request reset password",
+    "endpoint": "POST http://localhost:5000/api/user/request-reset-password",
+    "json or request body": {
+        "email":"niyonkuru@gmail.com"
+      },
+    "response": {
+        "token": "Bearer token",
+        "success": true,
+        "message": "Login successfully"
+    } 
+  },
+  {
+    "name": "Reset password",
+    "endpoint": "POST http://localhost:5070/api/user/reset-password",
+    "json or request body": {
+        "email":"niyonkuru@gmail.com",
+        "newPassword":"123"
+      },
+    "response": {
+        "success": true,
+        "message": "Password changed successful"
+    } 
+  },
+  {
+    "name": "Get profile info",
+    "endpoint": "GET http://localhost:5070/api/user/profile",
+    "json or request body": {
+        "email":"niyonkuru@gmail.com",
+        "newPassword":"123"
+      },
+    "response":{
+      "success": true,
+      "profileInfo": {
+          "userId": 3,
+          "name": "niyo samu",
+          "email": "sniyomail@gmail.com",
+          "imageUrl": "https://res.cloudinary.com/dya7uhzid/image/upload/v1746261257/user_images/qk6hxk78lcvadm3rymjh.png",
+        "createdAt": "2025-05-02T11:22:21.602Z"
+      }
+  }
+  },
+  {
+    "name": "Update profile info",
+    "endpoint": "POST http://localhost:5070/api/user/update",
+    "json or request body": {
+        "name":"Niyo Sam",
+        "email":"niyonkuru@gmail.com",
+        "password":"123"
+      },
+    "response":{
+        "success": true,
+        "updatedUser": {
+            "userId": 3,
+            "name": "niyo samu",
+            "email": "niyonkuru@gmail.com",
+            "password": "hashedPassword",
+            "imageUrl": "https://res.cloudinary.com/dya7uhzid/image/upload/v1746263414/user_images/k4bkytareikpdjzstnfy.png",
+            "createdAt": "2025-05-02T11:22:21.602Z",
+            "updatedAt": "2025-05-03T09:10:31.878Z"
+        }
+    }
+  }
+]
