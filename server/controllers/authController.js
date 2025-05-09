@@ -4,8 +4,6 @@ import prisma from '../lib/prisma.js';
 import { cloudinary } from '../config/cloudinary.js';
 import nodemailer from 'nodemailer';
 
-const JWT_SECRET = process.env.JWT_SECRET
-
 //Register user controller
 export const register = async (req, res) => {
   try {
@@ -39,11 +37,13 @@ export const register = async (req, res) => {
 //Login User Controller
 export const login = async (req, res) => {
   try {
+    const JWT_SECRET = process.env.JWT_SECRET 
     const { email, password } = req.body;
     if(!email || !password) return res.status(400).json({success:false, message:"All Fields Are Required"})
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(401).json({success:false, message: 'User Not Foumd' });
+     console.log("JWT_SECRET inside login controller:", JWT_SECRET);
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ success:false, message:'Invalid Password' });
