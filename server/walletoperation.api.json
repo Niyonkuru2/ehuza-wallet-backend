@@ -1,0 +1,41 @@
+[
+  {
+    "name": "Deposit Money",
+    "endpoint": "POST http://localhost:5070/wallet/deposit",
+    "json or request body": {
+        "amount": 500,
+        "description": "Initial deposit"
+    },
+    "response": {
+        "success": true,
+        "message": "User registered successfully",
+        "userId": 4
+    }
+  },
+  {
+    "name": "Withdrawing Money",
+    "endpoint": "POST http://localhost:5070/wallet/withdraw",
+    "json or request body": {
+        "amount": 200,
+        "description": "Buying groceries"
+    },
+    "response": {
+        "success": true,
+        "message": "Withdrawal successful",
+        "balance": 600
+    }
+  },
+  
+  
+  
+  {
+    "name": "Get Balance",
+    "endpoint": "GET http://localhost:5070/wallet",
+    "json or request body": {
+        "bearer_token":"value"
+      },
+    "response":{
+    "balance": 300 
+     }
+  }
+]
