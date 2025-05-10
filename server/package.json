@@ -12,7 +12,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.6.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.6.0",
@@ -21,10 +20,11 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.2",
-    "nodemailer": "^6.10.1",
-    "prisma": "^6.6.0"
+    "nodemailer": "^6.10.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "@prisma/client": "^6.7.0",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.7.0"
   }
 }
