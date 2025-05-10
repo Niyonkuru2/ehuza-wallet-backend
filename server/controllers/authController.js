@@ -117,15 +117,13 @@ export const resetPassword = async (req, res) => {
   // Check password length
   if (newPassword.length < 8) {
     return res.status(400).json({
-      success: false,
-      message: "Your password must be greater than 8 characters"
+      success: false,message: "Your password must be greater than 8 characters"
     });
   }
 
   // Check for special character
   if(!isVarid){
-    return res.status(400).json({success:false,message:"Include special characters in your password"})
-      
+    return res.status(400).json({success:false,message:"Include special characters in your password"}) 
     }
 
   try {
@@ -148,7 +146,6 @@ export const resetPassword = async (req, res) => {
         success: false,message: "User not found"
       });
     }
-
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await prisma.user.update({
@@ -161,7 +158,7 @@ export const resetPassword = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      success: false,message:error.message
+      success: false,message:"something went wrong"
     });
   }
 };
