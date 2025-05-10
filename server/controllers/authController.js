@@ -101,7 +101,7 @@ export const RequestResetPassword = async(req,res)=>{
 
     res.send({
       success: true,
-      message: 'Password reset link sent'
+      message: 'Password reset link sent on Your Email'
     });
   } catch (error) {
   res.status(500).json({success:false,message:error.message})
