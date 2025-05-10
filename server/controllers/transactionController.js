@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma.js";
+
 // GET  at least 10 transctions
 export const getTransactionHistory = async (req, res) => {
   const userId = req.user.userId;

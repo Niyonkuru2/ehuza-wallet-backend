@@ -18,7 +18,7 @@ export const getWalletBalance = async (req, res) => {
 //deposit money
 export const depositMoney = async (req, res) => {
   const { amount, description } = req.body;
-  if(!amount,description) return res.status(400).json({success:false, message: "All fields are required" });
+  if(!amount,!description) return res.status(400).json({success:false, message: "All fields are required" });
 
   if (amount <= 0) return res.status(400).json({success:false, message: "Amount must be greater than zero" });
 
@@ -46,7 +46,7 @@ export const depositMoney = async (req, res) => {
 //withdrawing money
 export const withdrawMoney = async (req, res) => {
   const { amount, description } = req.body;
-  if(!amount,description) return res.status(400).json({success:false, message: "All fields are required" });
+  if(!amount,!description) return res.status(400).json({success:false, message: "All fields are required" });
 
   if (amount <= 0)return res.status(400).json({success:false, message: "Amount must be greater than zero" });
   
