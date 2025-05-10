@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import validator from 'validator'
 import prisma from '../lib/prisma.js';
 import { cloudinary } from '../config/cloudinary.js';
 import nodemailer from 'nodemailer';
@@ -9,12 +10,26 @@ const JWT_SECRET = process.env.JWT_SECRET
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    const isVarid = validator.matches(password,specialChars);
     if (!name || !email || !password)
       return res.status(400).json({ success: false, message: "All Fields Are Required" });
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing)
       return res.status(400).json({ success: false, message: 'Existing user with this email Id' });
+    //validating email format
+    
+    if (!validator.isEmail(email))  {
+            return res.json({success:false,message:"enter a valid Email"})
+          }
+      // validating strong password
+   if (password.length < 8) {
+            return res.json({success:false,message:"Create at least 8characters to create password"})
+        }
+        if(!isVarid){
+            return res.json({success:false,message:"Include special characters in your password"})
+        }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
