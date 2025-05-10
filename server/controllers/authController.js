@@ -110,23 +110,61 @@ export const RequestResetPassword = async(req,res)=>{
 
 // Reset password controller
 export const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+  
+  // Check password length
+  if (newPassword.length < 8) {
+    return res.status(400).json({
+      success: false,
+      message: "Your password must be greater than 8 characters"
+    });
+  }
+
+  // Check for special character
+  const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+  if (!specialChars.test(newPassword)) {
+    return res.status(400).json({
+      success: false,
+      message: "Include special characters in your password"
+    });
+  }
+
   try {
-    const { email, newPassword } = req.body;
-    
-    if(!email || !newPassword) return res.status(400).json({success:false,message:"All fields Are required"})
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(401).json({success:false, message: 'User not found' });
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired token"
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,message: "User not found"
+      });
+    }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await prisma.user.update({
-      where: { email },
+      where: { id: user.id },
       data: { password: hashedPassword },
     });
 
-    res.status(200).json({success:true, message: 'Password changed successful' });
+    res.status(200).json({
+      success: true,message: "Password updated successfully"
+    });
   } catch (error) {
-    res.status(500).json({success:false,message:error.message });
+    res.status(500).json({
+      success: false,message:error.message
+    });
   }
 };
 
