@@ -6,11 +6,12 @@ import { cloudinary } from '../config/cloudinary.js';
 import nodemailer from 'nodemailer';
 
 const JWT_SECRET = process.env.JWT_SECRET 
+const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+
 //Register user controller
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
     const isVarid = validator.matches(password,specialChars);
     if (!name || !email || !password)
       return res.status(400).json({ success: false, message: "All Fields Are Required" });
@@ -112,7 +113,7 @@ export const RequestResetPassword = async(req,res)=>{
 export const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { newPassword } = req.body;
-  
+  const isVarid = validator.matches(newPassword,specialChars);
   // Check password length
   if (newPassword.length < 8) {
     return res.status(400).json({
@@ -122,13 +123,10 @@ export const resetPassword = async (req, res) => {
   }
 
   // Check for special character
-  const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-  if (!specialChars.test(newPassword)) {
-    return res.status(400).json({
-      success: false,
-      message: "Include special characters in your password"
-    });
-  }
+  if(!isVarid){
+    return res.status(400).json({success:false,message:"Include special characters in your password"})
+      
+    }
 
   try {
     let decoded;
