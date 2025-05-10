@@ -1,0 +1,27 @@
+[
+  {
+    "name": " GetUserTransaction",
+    "endpoint": "GETT http://localhost:5070/transactions",
+    "response": {
+    "success": true,
+    "transactions": [
+        {
+            "transactionId": 4,
+            "walletId": 4,
+            "amount": 200,
+            "type": "withdraw",
+            "description": "Buying groceries",
+            "createdAt": "2025-05-10T08:11:53.855Z"
+        },
+        {
+            "transactionId": 3,
+            "walletId": 4,
+            "amount": 500,
+            "type": "deposit",
+            "description": "Initial deposit",
+            "createdAt": "2025-05-10T08:10:55.667Z"
+        }
+    ]
+}
+  }
+]
