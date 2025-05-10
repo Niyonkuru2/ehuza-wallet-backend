@@ -21,14 +21,14 @@ export const register = async (req, res) => {
     //validating email format
     
     if (!validator.isEmail(email))  {
-            return res.json({success:false,message:"enter a valid Email"})
+            return res.status(400).json({success:false,message:"enter a valid Email"})
           }
       // validating strong password
    if (password.length < 8) {
-            return res.json({success:false,message:"Create at least 8characters to create password"})
+            return res.status(400).json({success:false,message:"Create at least 8 characters to create strong password"})
         }
         if(!isVarid){
-            return res.json({success:false,message:"Include special characters in your password"})
+            return res.status(400).json({success:false,message:"Include special characters in your password"})
         }
 
     const hashedPassword = await bcrypt.hash(password, 10);
