@@ -189,26 +189,33 @@ export const getUserProfile = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { name, email, newPassword } = req.body;
-    const isVarid = validator.matches(newPassword,specialChars);
     const userId = req.user.userId;
 
-    //validating email format
-    
-    if (!validator.isEmail(email))  {
-            return res.status(400).json({success:false,message:"enter a valid Email"})
-          }
-      // validating strong password
-   if (newPassword.length < 8) {
-            return res.status(400).json({success:false,message:"Create at least 8 characters to create strong password"})
-        }
-        if(!isVarid){
-            return res.status(400).json({success:false,message:"Include special characters in your password"})
-        }
-    // Check if the email is already taken by another user
+    // Validate email if provided
+    if (email && !validator.isEmail(email)) {
+      return res.status(400).json({ success: false, message: "Enter a valid email" });
+    }
+
+    // Validate password if provided
+    if (newPassword) {
+      if (newPassword.length < 8) {
+        return res.status(400).json({ success: false, message: "Password must be at least 8 characters" });
+      }
+
+      // Define the special character regex pattern
+      const specialChars = /[!@#$%^&*(),.?":{}|<>]/;
+
+      if (!validator.matches(newPassword, specialChars)) {
+        return res.status(400).json({ success: false, message: "Include special characters in your password" });
+      }
+    }
+
+    // Check if the email is already taken
     if (email) {
       const existingUser = await prisma.user.findUnique({
         where: { email },
       });
+
       if (existingUser && existingUser.userId !== userId) {
         return res.status(400).json({
           success: false,
@@ -219,34 +226,32 @@ export const updateUser = async (req, res) => {
 
     let imageUrl;
     if (req.file) {
-      // upload image to cloudinary
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: 'user_images',
       });
       imageUrl = result.secure_url;
     }
 
-    // Prepare data to update
     const updateData = {
       ...(name && { name }),
       ...(email && { email }),
       ...(imageUrl && { imageUrl }),
     };
 
-    // Hash and add password if provided
     if (newPassword) {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       updateData.password = hashedPassword;
     }
 
     const updatedUser = await prisma.user.update({
-      where: { userId},
+      where: { userId },
       data: updateData,
     });
 
-    res.status(200).json({success:true,updatedUser});
+    res.status(200).json({ success: true, updatedUser });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
