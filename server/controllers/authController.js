@@ -188,9 +188,22 @@ export const getUserProfile = async (req, res) => {
 //Update user profile controller
 export const updateUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, newPassword } = req.body;
+    const isVarid = validator.matches(newPassword,specialChars);
     const userId = req.user.userId;
 
+    //validating email format
+    
+    if (!validator.isEmail(email))  {
+            return res.status(400).json({success:false,message:"enter a valid Email"})
+          }
+      // validating strong password
+   if (newPassword.length < 8) {
+            return res.status(400).json({success:false,message:"Create at least 8 characters to create strong password"})
+        }
+        if(!isVarid){
+            return res.status(400).json({success:false,message:"Include special characters in your password"})
+        }
     // Check if the email is already taken by another user
     if (email) {
       const existingUser = await prisma.user.findUnique({
@@ -221,9 +234,9 @@ export const updateUser = async (req, res) => {
     };
 
     // Hash and add password if provided
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      updateData.password = hashedPassword;
+    if (newPassword) {
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      updateData.newPassword = hashedPassword;
     }
 
     const updatedUser = await prisma.user.update({
