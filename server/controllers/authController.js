@@ -236,7 +236,7 @@ export const updateUser = async (req, res) => {
     // Hash and add password if provided
     if (newPassword) {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      updateData.newPassword = hashedPassword;
+      updateData.password = hashedPassword;
     }
 
     const updatedUser = await prisma.user.update({
