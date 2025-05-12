@@ -80,7 +80,7 @@ export const RequestResetPassword = async(req,res)=>{
   const user = await prisma.user.findUnique({where:{email}})
   if(!user) return res.status(400).json({success:false, message:"User Not Found"})
 
-    const token = jwt.sign({ id: user.userId }, JWT_SECRET, { expiresIn: '15m' });
+    const token = jwt.sign({ userId: user.userId }, JWT_SECRET, { expiresIn: '15m' });
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 
     // Send the reset link via email
@@ -113,55 +113,59 @@ export const RequestResetPassword = async(req,res)=>{
 export const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { newPassword } = req.body;
-  const isVarid = validator.matches(newPassword,specialChars);
+
+  const isValid = validator.matches(newPassword, specialChars);
+
   // Check password length
   if (newPassword.length < 8) {
-    return res.status(400).json({
-      success: false,message: "Your password must be greater than 8 characters"
+    return res.status(400).json({success: false,message: "Your password must be greater than 8 characters",
     });
   }
 
   // Check for special character
-  if(!isVarid){
-    return res.status(400).json({success:false,message:"Include special characters in your password"}) 
-    }
+  if (!isValid) {
+    return res.status(400).json({success: false,message: "Include special characters in your password",
+    });
+  }
 
   try {
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid or expired token"
+      return res.status(400).json({success: false,message: "Invalid or expired token",
+      });
+    }
+
+    if (!decoded.userId) {
+      return res.status(400).json({success: false, message: "Invalid token payload",
       });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
+      where: { userId: decoded.userId },
     });
 
     if (!user) {
-      return res.status(404).json({
-        success: false,message: "User not found"
+      return res.status(404).json({success: false,message: "User not found",
       });
     }
+
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await prisma.user.update({
-      where: { id: user.id },
+      where: { userId: user.userId },
       data: { password: hashedPassword },
     });
 
-    res.status(200).json({
-      success: true,message: "Password updated successfully"
+    res.status(200).json({success: true,message: "Password updated successfully",
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,message:"something went wrong"
+    res.status(500).json({success: false,message: error.message,
     });
   }
 };
+
 
 //Get user profile controller
 export const getUserProfile = async (req, res) => {
@@ -250,7 +254,6 @@ export const updateUser = async (req, res) => {
 
     res.status(200).json({ success: true, updatedUser });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
