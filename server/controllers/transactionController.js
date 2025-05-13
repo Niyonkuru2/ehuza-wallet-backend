@@ -28,9 +28,13 @@ export const getTransactionHistory = async (req, res) => {
     ]);
 
     res.status(200).json({
-      success:true,
-      transactions
-    });
+    success: true,
+    transactions,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit)
+});
+
 
   } catch (error) {
     res.status(500).json({ message: error.message});
