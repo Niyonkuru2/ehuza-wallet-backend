@@ -41,34 +41,20 @@ export const getTransactionHistory = async (req, res) => {
   }
 };
 
+
 // GET monthly aggregated transaction history (deposit and withdraw)
 export const getMonthlyTransactionHistory = async (req, res) => {
   const userId = req.user.userId;
 
   try {
-    // Get the user's wallet
     const wallet = await prisma.wallet.findUnique({
       where: { userId },
     });
 
-    if (!wallet) return res.status(404).json({ success: false, message: "Wallet not found" });
+    if (!wallet) {
+      return res.status(404).json({ success: false, message: "Wallet not found" });
+    }
 
-    // Group by month and transaction type
-    const groupedData = await prisma.transaction.groupBy({
-      by: ['type'],
-      where: {
-        walletId: wallet.walletId,
-        createdAt: {
-          gte: new Date(new Date().setFullYear(new Date().getFullYear() - 1)), // last year
-        },
-      },
-      _sum: {
-        amount: true,
-      },
-      // We still need to fetch createdAt here for monthly formatting
-    });
-
-    // Now, group by month and merge types
     const rawTransactions = await prisma.transaction.findMany({
       where: {
         walletId: wallet.walletId,
@@ -83,24 +69,28 @@ export const getMonthlyTransactionHistory = async (req, res) => {
       },
     });
 
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const monthlyMap = new Map();
 
     rawTransactions.forEach(tx => {
       const date = new Date(tx.createdAt);
-      const month = date.getMonth() + 1;
+      const month = date.getMonth(); // 0-based index (0 = Jan)
 
-      if (!monthlyMap.has(month)) {
-        monthlyMap.set(month, { month, deposit: 0, withdraw: 0 });
+      const monthName = monthNames[month];
+
+      if (!monthlyMap.has(monthName)) {
+        monthlyMap.set(monthName, { month: monthName, deposit: 0, withdraw: 0 });
       }
 
-      const current = monthlyMap.get(month);
+      const current = monthlyMap.get(monthName);
+
       if (tx.type === 'deposit') {
         current.deposit += tx.amount;
       } else if (tx.type === 'withdraw') {
         current.withdraw += tx.amount;
       }
 
-      monthlyMap.set(month, current);
+      monthlyMap.set(monthName, current);
     });
 
     const monthlyComparisonData = Array.from(monthlyMap.values());
