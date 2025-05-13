@@ -42,42 +42,72 @@ export const getMonthlyTransactionHistory = async (req, res) => {
   const userId = req.user.userId;
 
   try {
-    // Fetch the user's wallet
+    // Get the user's wallet
     const wallet = await prisma.wallet.findUnique({
       where: { userId },
     });
 
     if (!wallet) return res.status(404).json({ success: false, message: "Wallet not found" });
 
-    // Get monthly aggregated data (sum of deposits and withdrawals for each month)
-    const monthlyData = await prisma.transaction.groupBy({
-      by: ['createdAt'], // Group by the createdAt field
-      where: { walletId: wallet.walletId },
-      _sum: {
-        amount: true, // Sum the amounts of deposit/withdraw
-      },
-      having: {
+    // Group by month and transaction type
+    const groupedData = await prisma.transaction.groupBy({
+      by: ['type'],
+      where: {
+        walletId: wallet.walletId,
         createdAt: {
-          gte: new Date(new Date().setFullYear(new Date().getFullYear() - 1)), // Only get transactions from the last year (optional)
+          gte: new Date(new Date().setFullYear(new Date().getFullYear() - 1)), // last year
         },
       },
-      orderBy: {
-        createdAt: 'asc',
+      _sum: {
+        amount: true,
+      },
+      // We still need to fetch createdAt here for monthly formatting
+    });
+
+    // Now, group by month and merge types
+    const rawTransactions = await prisma.transaction.findMany({
+      where: {
+        walletId: wallet.walletId,
+        createdAt: {
+          gte: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
+        },
+      },
+      select: {
+        createdAt: true,
+        type: true,
+        amount: true,
       },
     });
 
-    // Format the data into a format suitable for the frontend (monthly comparison)
-    const monthlyComparisonData = monthlyData.map((item) => ({
-      month: item.createdAt.getMonth() + 1, // Get the month (1-12)
-      deposit: item._sum.amount > 0 ? item._sum.amount : 0, // Aggregate deposits
-      withdraw: item._sum.amount < 0 ? Math.abs(item._sum.amount) : 0, // Aggregate withdrawals (positive value)
-    }));
+    const monthlyMap = new Map();
+
+    rawTransactions.forEach(tx => {
+      const date = new Date(tx.createdAt);
+      const month = date.getMonth() + 1;
+
+      if (!monthlyMap.has(month)) {
+        monthlyMap.set(month, { month, deposit: 0, withdraw: 0 });
+      }
+
+      const current = monthlyMap.get(month);
+      if (tx.type === 'deposit') {
+        current.deposit += tx.amount;
+      } else if (tx.type === 'withdraw') {
+        current.withdraw += tx.amount;
+      }
+
+      monthlyMap.set(month, current);
+    });
+
+    const monthlyComparisonData = Array.from(monthlyMap.values());
 
     res.status(200).json({
       success: true,
       monthlyTransactions: monthlyComparisonData,
     });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
