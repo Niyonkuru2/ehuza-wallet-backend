@@ -192,7 +192,7 @@ export const getUserProfile = async (req, res) => {
 //Update user profile controller
 export const updateUser = async (req, res) => {
   try {
-    const { name, email, newPassword } = req.body;
+    const { name, email, newPassword,imageUrl: base64Image } = req.body;
     const userId = req.user.userId;
 
     // Validate email if provided
@@ -229,12 +229,12 @@ export const updateUser = async (req, res) => {
     }
 
     let imageUrl;
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'user_images',
+    if (base64Image) {
+     const result = await cloudinary.uploader.upload(base64Image, {
+      folder: 'user_images',
       });
-      imageUrl = result.secure_url;
-    }
+  imageUrl = result.secure_url;
+}
 
     const updateData = {
       ...(name && { name }),
