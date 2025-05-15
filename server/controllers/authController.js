@@ -47,7 +47,7 @@ export const register = async (req, res) => {
 
     res.status(201).json({ success: true, message: 'User registered successfully', userId: user.userId });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message:"Something went wrong. Try Again"});
   }
 };
 
@@ -68,7 +68,7 @@ export const login = async (req, res) => {
 
     res.status(200).json({ token, success:true, message:"Login successfully" });
   } catch (error) {
-    res.status(500).json({success:false, message: error.message });
+    res.status(500).json({success:false, message:"Something went wrong. Try Again"});
   }
 };
 
@@ -105,7 +105,7 @@ export const RequestResetPassword = async(req,res)=>{
       message: 'Password reset link sent on Your Email'
     });
   } catch (error) {
-  res.status(500).json({success:false,message:error.message})
+  res.status(500).json({success:false,message:"Something went wrong. Try Again"})
  }
 }
 
@@ -161,8 +161,7 @@ export const resetPassword = async (req, res) => {
     res.status(200).json({success: true,message: "Password updated successfully",
     });
   } catch (error) {
-    res.status(500).json({success: false,message: error.message,
-    });
+    res.status(500).json({success: false, message:"Something went wrong. Try Again"});
   }
 };
 
@@ -184,7 +183,7 @@ export const getUserProfile = async (req, res) => {
 
     return res.status(200).json({ success: true, profileInfo });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message:"Something went wrong. Try Again"});
   }
 };
 
@@ -254,7 +253,7 @@ export const updateUser = async (req, res) => {
 
     res.status(200).json({ success: true, updatedUser });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message:"Something went wrong. Try Again" });
   }
 };
 

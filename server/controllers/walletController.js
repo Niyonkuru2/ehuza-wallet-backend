@@ -11,7 +11,7 @@ export const getWalletBalance = async (req, res) => {
 
     res.status(200).json({ balance: wallet.balance });
   } catch (error) {
-    res.status(500).json({success:false,message:error.message });
+    res.status(500).json({success:false, message:"Something went wrong. Try Again" });
   }
 };
 
@@ -73,8 +73,8 @@ export const withdrawMoney = async (req, res) => {
       },
     });
 
-    res.status(200).json({success:true, message: "Withdrawal successful", balance: updatedWallet.balance });
+    res.status(200).json({success:true, message: "Withdraw successful", balance: updatedWallet.balance });
   } catch (error) {
-    res.status(500).json({ success:false,message:error.message });
+    res.status(500).json({ success:false,message:"Something went wrong. Try Again"});
   }
 };
